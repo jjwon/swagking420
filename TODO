@@ -1,0 +1,5 @@
+better scraper/scraping locations
+keep iterating the skip word list
+refactor the code, maybe with a config file that has the constants
+make frontend not look like ass
+keep adjusting ratio between words and phrases to prevent crowding
