@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+<script src="d3.min.js"></script>
+<script src="d3-cloud/d3.layout.cloud.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js"></script>
+<style>
+  body {
+    text-align: center;
+  }
+  svg {
+    display: block;
+    margin: 0 auto;
+  }
+
+  #input {
+    width: 20em;
+    display: inline-block;
+    text-align: center;
+  }
+
+  #back {
+    display: inline-block;
+    text-align: center;
+  }
+</style>
+
+<script>
+  var fill = d3.scale.category20();
+
+  var callback = function(data) {
+    if (!data) {
+      $("#error").show();
+      return;
+    }
+    console.log(data);
+    var frases = JSON.parse(data.phrases)
+    var palabras = JSON.parse(data.words);
+
+    d3.layout.cloud().size([750, 450])
+      .words(palabras.concat(frases))
+      .padding(1)
+      .rotate(0)
+      .font("Impact")
+      .fontSize(function(d) { return d.size; })
+      .on("end", draw)
+      .start();
+  }
+  
+  function draw(words) {
+    d3.select("#svgcontainer").append("svg")
+        .attr("width", 750)
+        .attr("height", 450)
+      .append("g")
+        .attr("transform", "translate(375,225)")
+      .selectAll("text")
+        .data(words)
+      .enter().append("text")
+        .style("font-size", function(d) { return d.size + "px"; })
+        .style("font-family", "Impact")
+        .style("fill", function(d, i) { return fill(i); })
+        .attr("text-anchor", "middle")
+        .attr("transform", function(d) {
+          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+        })
+        .text(function(d) { return d.text; });
+  }
+
+  $(function() {
+    $('#submit').click(function() {
+      var artist = $('#selectArtist').find(":selected").text()
+      $.get('get_words', { artist: artist }, callback);
+      $('#input').hide();
+      $('#back').show();
+      $('#artistname').show();
+      $('#artist').text(artist);
+    });
+    $("#error").hide();
+    $("#back").hide();
+    $("#artistname").hide();
+
+    $('#back').click(function() {
+      $('svg').remove();
+      $('#input').show();
+      $('#back').hide();
+      $('#artistname').hide();
+    });
+
+    // var artists = ['pitbull', 'eminem', 'yg', 'jason derulo', 'sage the gemini', 'trey songz', 'ty dolla sign', 'chris brown', 'drake', 'robin thicke'];
+  });
+
+
+</script>
+
+<h1>$$swagking420$$</h1>
+
+<div id="error">
+  <p>NO ARTIST FOUND</p>
+</div>
+
+<div id="artistname">
+  <h3 id="artist"></h3>
+</div>
+
+<div id="input">
+  <p>Artist Name: <select id="selectArtist">
+    <option>Choose an artist.</option>
+    <option>pitbull</option>
+    <option>eminem</option>
+    <option>yg</option>
+    <option>jason derulo</option>
+    <option>sage the gemini</option>
+    <option>trey songz</option>
+    <option>ty dolla sign</option>
+    <option>chris brown</option>
+    <option>drake</option>
+    <option>robin thicke</option>
+</select></p>
+  <button id="submit">Submit</button>
+</div>
+
+<div id="svgcontainer">
+</div>
+
+<button id="back">Back</button>
