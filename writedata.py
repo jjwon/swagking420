@@ -7,7 +7,8 @@ import json
 from sets import Set
 import operator
 
-SKIP_THESE_WORDS = ['i', 'we', 'a', 'to', 'me', 'you', 'if', "i'm", 'it', 'got', 'the', 'in', 'on', 'for', 'my', 'its', 'too', 'is', 'am', 'was', 'as', 'be', 'were', 'when', 'they', 'them', 'your', "you're", 'and', 'like', "don't", 'but', 'with', 'that', "it's", 'of', 'what', 'want', 'wanna', 'girl', 'had', "ain't", 'from', 'this', 'do']
+SKIP_THESE_WORDS = ['a', "ain't", 'am', 'and', 'as', 'be', 'but', 'do', "don't", 'for', 'from', 'girl', 'got', 'had', 'i', "i'm", 'if', 'in', 'is', 'it', "it's", 'its', 'like', 'me', 'my', 'of', 'on', 'that', 'the', 'them', 'they', 'this', 'to', 'too', 'wanna', 'want', 'was', 'we', 'were', 'what', 'when', 'with', 'you', "you're", 'your']
+
 
 	# SKIP_THESE_WORDS = ['all', 'just', 'being', 'over', 'both', 'through', 'yourselves', 'its', 'before', 'herself', 'had', 'should', 'to', 'only', 'under', 'ours', 'has', 'do', 'them', 'his', 'very', 'they', 'not', 'during', 'now', 'him', 'nor', 'did', 'this', 'she', 'each', 'further', 'where', 'few', 'because', 'doing', 'some', 'are', 'our', 'ourselves', 'out', 'what', 'for', 'while', 'does', 'above', 'between', 't', 'be', 'we', 'who', 'were', 'here', 'hers', 'by', 'on', 'about', 'of', 'against', 's', 'or', 'own', 'into', 'yourself', 'down', 'your', 'from', 'her', 'their', 'there', 'been', 'whom', 'too', 'themselves', 'was', 'until', 'more', 'himself', 'that', 'but', 'don', 'with', 'than', 'those', 'he', 'me', 'myself', 'these', 'up', 'will', 'below', 'can', 'theirs', 'my', 'and', 'then', 'is', 'am', 'it', 'an', 'as', 'itself', 'at', 'have', 'in', 'any', 'if', 'again', 'no', 'when', 'same', 'how', 'other', 'which', 'you', 'after', 'most', 'such', 'why', 'a', 'off', 'i', 'yours', 'so', 'the', 'having', 'once']
 
@@ -75,9 +76,7 @@ def normalize_line(line):
 	for p in punct:
 		line = line.replace(p, '')
 
-	if "," in line:
-		print line
-	return line.lower().replace('"', "'").decode('utf-8').replace(u'\u2019', "'")
+	return line.lower().replace('"', "'").decode('utf-8').replace(u'\u2019', "'").replace(u'\u2018', "'")
 
 def normalize_data(filename):
 	lines = [normalize_line(line) for line in open(filename)]
