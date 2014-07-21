@@ -8,7 +8,9 @@ from DBHelper import DBHelper
 < STRING: dict of artists -> (lyric string, phrase count string)
 """
 
-IGNORE_WORDS = ['a', "ain't", 'am', 'and', 'as', 'be', 'but', 'do', "don't", 'for', 'from', 'girl', 'got', 'had', 'i', "i'm", 'if', 'in', 'is', 'it', "it's", 'its', 'like', 'me', 'my', 'of', 'on', 'that', 'the', 'them', 'they', 'this', 'to', 'too', 'wanna', 'want', 'was', 'we', 'were', 'what', 'when', 'with', 'you', "you're", 'your']
+IGNORE_WORDS = Set(['a', 'all', 'at', "ain't", 'am', 'and', 'as', 'be', 'been', 'but', 'do', "don't", 'down','for', 'from', 'girl','get', 'go', 'got', 'had', 'i', "i'm", 'if', 'in', 'is', 'it', "it's", 'its', "i've" , 'just' ,'like', 'me', 'my', 'now' ,'not' ,'of','off','oh' ,'on', 'put' ,'she','so','that', 'the','then', 'these' ,'them', 'they', 'this', 'to', 'too', 'up','wanna', 'want', 'was', 'we', 'were', 'what', 'when','where', 'who', 'why' ,'with', "won't" , 'you', "you're", 'your'])
+
+END_WORDS = Set(['a', 'the', 'with', 'of'])
 
 class ComputeCounts:
 
@@ -54,23 +56,6 @@ class ComputeCounts:
 				old[k] = new[k]
 		return old
 
-	@staticmethod
-	def all_ignore_words(words):
-		all_ignore = True
-		for word in words.split():
-			if word not in IGNORE_WORDS:
-				all_ignore = False
-				break
-		return all_ignore
-
-	@staticmethod
-	def is_subset(p, all_p):
-		is_sub = False
-		for a in all_p:
-			if p in a and p != a:
-				is_sub = True
-				break
-		return is_sub
 
 	@staticmethod
 	def get_phrase_counts(lyrics, phrases, option):
@@ -78,7 +63,7 @@ class ComputeCounts:
 		counts = []
 
 		for phrase in phrases:
-			if len(phrase) >= 20:
+			if len(phrase.split()) >= 8:
 				continue
 			if phrase in lyrics:
 				counts.append({"text": phrase, "size": lyrics.count(phrase)})
@@ -153,7 +138,8 @@ class ComputeCounts:
 		for artist in longest_common.keys():
 			sorted_lcss = sorted(longest_common[artist].iteritems(), key=operator.itemgetter(1), reverse=True)
 			longest_common[artist] = ComputeCounts.filter_phrases(sorted_lcss)
-			longest_common[artist] = longest_common[artist][:(min(len(longest_common[artist])/4, 15))]
+			longest_common[artist] = longest_common[artist][:min(35, len(longest_common[artist]))]
+			# longest_common[artist] = longest_common[artist][:(min(len(longest_common[artist])/4, 15))]
 		# return norm_phrases
 
 	@staticmethod
@@ -164,9 +150,27 @@ class ComputeCounts:
 
 		for phrase in phrases:
 			p = phrase[0]
-			if not ComputeCounts.all_ignore_words(p) and not ComputeCounts.is_subset(p, all_p):
+			if not ComputeCounts.all_ignore_words(p) and not ComputeCounts.is_subset(p, all_p):# and p[-1] not in END_WORDS:
 				norm_phrases.append(phrase)
 		return norm_phrases
+
+	@staticmethod
+	def all_ignore_words(words):
+		all_ignore = True
+		for word in words.split():
+			if word not in IGNORE_WORDS:
+				all_ignore = False
+				break
+		return all_ignore
+
+	@staticmethod
+	def is_subset(p, all_p):
+		is_sub = False
+		for a in all_p:
+			if p in a and p != a:
+				is_sub = True
+				break
+		return is_sub
 
 	@staticmethod
 	def get_all_phrase_counts(db_name, table_name, artist_lyrics, norm_phrases, option):
@@ -185,25 +189,30 @@ class ComputeCounts:
 		# artist -> [(phrase,occurance)]
 		sql_dict = ComputeCounts.all_lcs(artists)
 
+		print "=====Getting LCS ====="
+
 		for artist in sql_dict.keys():
-			# print sql_dict[artist]
-			print len(sql_dict[artist])
-			break
+			if artist == 'yg':
+				print artist, sql_dict[artist]
+				break
 
 		print "=====Filtering phrases====="
 
 		# artist -> [(phrase, occurance)] w/ subset and ignore phrases removed
 		ComputeCounts.filter_all_phrases(sql_dict)
 		for artist in sql_dict.keys():
-			print artist , sql_dict[artist]
-			print len(sql_dict[artist])
-			# break
+			if artist == 'yg':
+				print artist, sql_dict[artist]
+				break
+
 
 		print "=====Getting phrase counts ====="
 
 		# artist -> [{text:,size:}]
 		ComputeCounts.get_all_phrase_counts(db_name, table_name, dict((key, value) for (key, value) in artists.iteritems()), sql_dict, 'gayson')
 		for artist in sql_dict.keys():
-			print artist, sql_dict[artist]
-			# break
+			if artist == 'yg':
+				print artist, sql_dict[artist]
+				break
+
 

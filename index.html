@@ -35,10 +35,10 @@
     }
     console.log(data);
     var frases = JSON.parse(data.phrases)
-    var palabras = JSON.parse(data.words);
+    // var palabras = JSON.parse(data.words);
 
     d3.layout.cloud().size([750, 450])
-      .words(palabras.concat(frases))
+      .words(frases)
       .padding(1)
       .rotate(0)
       .font("Impact")

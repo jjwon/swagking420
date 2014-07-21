@@ -21,7 +21,8 @@ app.get('/get_words', function(req, res) {
     }
     //lol fix later...
     db.get("SELECT phrase_counts FROM music where artist_name=?", [req.query.artist], function(err, row1) {
-      res.send({phrases: row.phrase_counts, words: row1.phrase_counts});
+      console.log(row.phrase_counts);
+      res.send({phrases: row.phrase_counts});
     });
   });
   
